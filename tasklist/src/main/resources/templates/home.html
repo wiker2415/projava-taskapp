@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>タスク管理アプリケーション</title>
+    <link rel="stylesheet" th:href="@{/home.css}">
+</head>
+<body>
+    <h1>タスク管理アプリケーション</h1>
+
+    <div class="task_form">
+        <h2>タスクの登録</h2>
+        <form action="/add" method="get">
+            <label for="task">タスク</label>
+            <input type="text" name="task" id="task">
+            <label for="deadline">期限</label>
+            <input type="date" name="deadline" id="deadline">
+            <button>登録</button>
+        </form>
+    </div>
+    <div class="tasklist">
+        <h2>現在のタスク一覧</h2>
+        <table border="1" style="border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th class="hidden">ID</th>
+                    <th>タスク</th>
+                    <th width="150px">期限</th>
+                    <th width="100px">状態</th>
+                    <th>更新</th>
+                    <th>削除</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="task : ${taskList}">
+                    <td class="hidden" th:text="${task.id}"></td>
+                    <td th:text="${task.task}"></td>
+                    <td width="100px" th:text="${task.deadline}"></td>
+                    <td width="50px" th:text="${task.done} ? '完了' : '未完了'"></td>
+                    <td width="50px" style="text-align: center;">
+                        <button type="submit" id="update_button" onclick="
+                            let row = this.parentElement.parentElement;
+                            document.getElementById('update_id').value=row.cells[0].firstChild.data;
+                            document.getElementById('update_task').value=row.cells[1].firstChild.data;
+                            document.getElementById('update_deadline').value=row.cells[2].firstChild.data;
+                            document.getElementById('update_status').selectedIndex=(row.cells[3].firstChild.data=='完了' ? 1 : 0);
+                            var dialog = getElementById('updateDialog');
+                            dialog.style.left = ((window.innerWidth - 500) / 2) + 'px';
+                            dialog.style.display = 'block';
+                            ">更新</button>
+                    </td>
+                    <td width="50px" style="text-align: center;">
+                        <form action="/delete">
+                            <button id="delete_button">削除</button>
+                            <input type="hidden" name="id" th:value="${task.id}">
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="updateDialog">
+        <div class="task_form">
+            <h2>タスクの更新</h2>
+            <form action="/update">
+                <input type="hidden" id="update_id" name="id">
+                <label for="update_task">タスク</label>
+                <input type="text" id="update_task" name="task">
+                <label for="update_deadline">期限</label>
+                <input type="date" id="update_deadline" name="deadline">
+                <label for="update_status">状態</label>
+                <select name="done" id="update_status">
+                    <option value="false">未完了</option>
+                    <option value="true">完了</option>
+                </select>
+                <div>
+                    <button>更新</button>
+                    <button type="reset" onclick="getElementById('updateDialog').style.display='none';">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
